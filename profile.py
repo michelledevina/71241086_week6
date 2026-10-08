@@ -1,24 +1,82 @@
 import streamlit as st
 from user import user_data_by_username
 
-# CEK APAKAH SUDAH LOGIN
-    
+
+# cek apakah sudah login
+if "logged_in" not in st.session_state or not st.session_state.logged_in == True:
+    st.switch_page("app.py")
+
+
+st.set_page_config(page_title="DwTix - Profile")
+
+
+# ambil data user
 user = user_data_by_username()
 
-# hint untuk mematikan text input ada di -> https://docs.streamlit.io/develop/api-reference/widgets/st.text_input
-# BUAT 2 INPUT TEXT 1 Username 1 Password namun disable/matikan field Username dan yang password harus tipe password
 
-# Silahkan kalau mau baca baca ini hehe ga wajib ya-> https://discuss.streamlit.io/t/buttons-alignment/51929
-col1, space, col2 = st.columns([1,3,1])
+# ambil username yang sedang login
+username = st.session_state.username
+
+
+# ambil data user yang sedang login
+current_user = user[username]
+
+
+st.title("Profile")
+
+
+# 2 input text
+# Username disabled
+st.text_input(
+    "Username",
+    value=username,
+    disabled=True
+)
+
+
+# Password
+new_password = st.text_input(
+    "Password Baru",
+    type="password"
+)
+
+
+# kolom tombol
+col1, space, col2 = st.columns([1, 3, 1])
+
+
 with col1:
-    if st.button("logout", type="primary"): 
-        
-    # Buat tombol logout st.button("logout", type="primary") keluar ke app.py
-    pass
-        
+
+    # tombol logout
+    if st.button("Logout", type="primary"):
+
+        st.session_state.logged_in = False
+        st.session_state.username = ""
+
+        st.switch_page("app.py")
+
+
 with col2:
-    pass
-    # Ini untuk ubah password st.button("Ganti Data", type="secondary", width=400)
-    # Kondisi -> Password baru dan lama ga boleh sama 
-    # Jika sama -> st.error("ga boleh sama wok")
-    # jika beda ubah melalui variabel 'user' lalu tampilkan st.success("Berhasil")
+
+    # tombol ganti password
+    if st.button(
+        "Ganti Data",
+        type="secondary",
+        width=400
+    ):
+
+        # password baru tidak boleh sama dengan password lama
+        if new_password == current_user["password"]:
+
+            st.error("ga boleh sama wok")
+
+        elif new_password == "":
+
+            st.error("Password baru tidak boleh kosong")
+
+        else:
+
+            # ubah password
+            current_user["password"] = new_password
+
+            st.success("Berhasil")
